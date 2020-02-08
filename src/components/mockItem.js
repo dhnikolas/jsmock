@@ -18,14 +18,14 @@ class MockItem extends React.Component {
                 contentType: props.item.contentType,
                 headers: props.item.headers,
                 body: props.item.body,
-                emptyId: props.item.emptyId
+                isNew: props.item.isNew || false
             }
         };
 
         this.mockActions = React.createRef();
         this.currentState = {...this.state.item};
 
-        const currentId = this.state.item.id || this.state.item.emptyId;
+        const currentId = this.state.item.id;
         const bodyModalId = 'body' + currentId;
         EventEmitter.subscribe('saveModal' + bodyModalId, function (data) {
             this.saveBodyModal(data)
@@ -45,29 +45,30 @@ class MockItem extends React.Component {
         this.makeChanges(name, value)
     }
 
-    makeChanges(name, value){
+    makeChanges(name, value) {
         let item = {...this.state.item};
         item[name] = value;
-        this.setState({item:item});
+        this.setState({item: item});
         const isUpdated = JSON.stringify(item) !== JSON.stringify(this.currentState);
         this.mockActions.current.changeActions(isUpdated ? 'add' : 'delete')
     }
 
-    update(){
-        let method = this.state.item.id ? 'PATCH' : 'POST';
+    update() {
+        let method = this.state.item.isNew ? 'POST' : 'PATCH';
         fetch(process.env.REACT_APP_API_URL + '/v1/mock/', {
             method: method,
-            headers: { 'Content-Type': 'application/json' },
+            headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(this.state.item),
         }).then((response) => {
             response.json().then(json => {
-                if (json.id){
+                if (json.id) {
                     this.mockActions.current.changeActions('delete');
                     let item = {...this.state.item};
                     item['id'] = json.id;
-                    this.setState({canUpdate: false, item:item});
+                    item['isNew'] = false;
+                    this.setState({canUpdate: false, item: item});
                     this.currentState = {...this.state.item}
-                } else if (json.error){
+                } else if (json.error) {
                     this.errorMessage(json.error)
                 }
             });
@@ -76,14 +77,14 @@ class MockItem extends React.Component {
         })
     }
 
-    cancel(){
+    cancel() {
         this.mockActions.current.changeActions('delete');
         this.setState({canUpdate: false, item: {...this.currentState}})
     }
 
-    delete(){
-        if (this.state.item.id.length < 1){
-            this.props.deleteById(this.state.item.emptyId);
+    delete() {
+        if (this.state.item.isNew) {
+            this.props.deleteById(this.state.item.id);
             return;
         }
         // eslint-disable-next-line no-restricted-globals
@@ -93,16 +94,12 @@ class MockItem extends React.Component {
         }
         fetch(process.env.REACT_APP_API_URL + '/v1/mock/', {
             method: 'DELETE',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(this.state.item),
         }).then((response) => {
             response.json().then(json => {
                 if (json.status === 200) {
-                    if (this.state.item.emptyId && this.state.item.emptyId.length > 0) {
-                        this.props.deleteById(this.state.item.emptyId);
-                    } else {
-                        this.props.deleteById(this.state.item.id);
-                    }
+                    this.props.deleteById(this.state.item.id);
                 } else {
                     this.errorMessage(json)
                 }
@@ -113,25 +110,25 @@ class MockItem extends React.Component {
         })
     }
 
-    errorMessage(msg){
+    errorMessage(msg) {
         this.execModal('Error', {title: 'Error', body: msg}, 'info')
     }
 
-    execModal(name, data, type){
+    execModal(name, data, type) {
         const event = 'openModal';
-        data.initiatorId = name +  (this.state.item.id || this.state.item.emptyId);
+        data.initiatorId = name + this.state.item.id;
         data.type = type;
         console.log(data)
         EventEmitter.trigger(event, data)
     }
 
-    openBody(){
-        this.execModal('body', {title:'Body', body: this.state.item.body})
+    openBody() {
+        this.execModal('body', {title: 'Body', body: this.state.item.body})
     }
 
-    openHeaders(){
+    openHeaders() {
         const headersString = this.formatHeadersString(this.state.item.headers);
-        this.execModal('headers', {title:'Headers', body: headersString})
+        this.execModal('headers', {title: 'Headers', body: headersString})
     }
 
     saveBodyModal(data) {
@@ -142,20 +139,20 @@ class MockItem extends React.Component {
         this.makeChanges('headers', this.formatHeadersObject(data.body))
     }
 
-    formatHeadersString(headers){
+    formatHeadersString(headers) {
         let headersString = '';
         headers.forEach(function (h, i) {
-            headersString += h.name + ": " +h.value + '\n';
+            headersString += h.name + ": " + h.value + '\n';
         });
         return headersString
     }
 
-    formatHeadersObject(str){
+    formatHeadersObject(str) {
         let headers = [];
         const arrayLines = str.split(/\r?\n/);
         arrayLines.forEach(function (l) {
             const header = l.split(':');
-            if (header[0] && header[1]){
+            if (header[0] && header[1]) {
                 let name = header[0];
                 let value = header[1];
                 headers.push({"name": name.trim(), "value": value.trim()})
@@ -168,7 +165,7 @@ class MockItem extends React.Component {
     render() {
         let actionsS;
         switch (true) {
-            case this.state.canUpdate && this.state.item.emptyId.length > 0:
+            case this.state.canUpdate && this.state.item.isNew:
                 actionsS = 'add';
                 break;
             case !this.state.canUpdate:
@@ -178,7 +175,7 @@ class MockItem extends React.Component {
         }
 
         return (
-            <tr className="mockItem d-flex" >
+            <tr className="mockItem d-flex">
                 <th className="col-3">
                     <input className="form-control" type="text" name="mainUrl" value={this.state.item.mainUrl}
                            onChange={this.handleChanges.bind(this)}/>
@@ -204,7 +201,9 @@ class MockItem extends React.Component {
 
                 </th>
                 <th className="col-2">
-                    <div style={{cursor:'pointer'}} onClick={this.openBody.bind(this)}> {this.state.item.body.substring(0, 10)} ...</div>
+                    <div style={{cursor: 'pointer'}}
+                         onClick={this.openBody.bind(this)}> {this.state.item.body.substring(0, 10)} ...
+                    </div>
                 </th>
                 <th className="col-3">
                     <MockActions

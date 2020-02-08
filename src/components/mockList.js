@@ -19,14 +19,14 @@ class MockList extends React.Component {
 
     add() {
         const emptyItem = {
-            id: '',
+            id: Math.random().toString(36).substring(7),
             mainUrl: '/',
             method: 'POST',
             status: '200',
             contentType: '',
             headers: [{"name":"Content-Type", "value": "application/xml"}],
             body: '',
-            emptyId: Math.random().toString(36).substring(7)
+            isNew: true
         };
         this.setState({mockList: this.state.mockList.concat(emptyItem)})
     }
@@ -35,7 +35,7 @@ class MockList extends React.Component {
         let m = [];
         m = this.state.mockList;
         m.forEach(function (v, i) {
-            if(v.id === id || v.emptyId === id){
+            if(v.id === id){
                 delete m[i]
             }
         });
