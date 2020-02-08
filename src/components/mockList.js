@@ -12,48 +12,62 @@ class MockList extends React.Component {
     }
 
     async getMockList() {
-        const response = await fetch(process.env.REACT_APP_API_URL  + "/v1/mock/");
+        const response = await fetch(process.env.REACT_APP_API_URL + "/v1/mock/");
         const list = await response.json();
         this.setState({mockList: list})
     }
 
-    add(){
-        const emptyItem =          {
+    add() {
+        const emptyItem = {
             id: '',
             mainUrl: '/',
             method: 'POST',
             status: '200',
-            contentType: 'application/json',
+            contentType: '',
+            headers: [{"name":"Content-Type", "value": "application/xml"}],
             body: '',
+            emptyId: Math.random().toString(36).substring(7)
         };
-        console.log(this.state.mockList)
         this.setState({mockList: this.state.mockList.concat(emptyItem)})
     }
 
-    updateList(){
-        this.getMockList()
+    deleteById(id){
+        let m = [];
+        m = this.state.mockList;
+        m.forEach(function (v, i) {
+            if(v.id === id || v.emptyId === id){
+                delete m[i]
+            }
+        });
+
+        this.setState({mockList: m})
+    }
+
+    search () {
+        
     }
 
     render() {
-        const listItems = this.state.mockList.map((d, i) => <MockItem key={i} item={d} updateList={this.updateList.bind(this)}/>);
+        const listItems = this.state.mockList.map((d, i) => <MockItem key={i} item={d}
+                                                                      deleteById={this.deleteById.bind(this)}/>);
         return (
             <div>
                 <table className="mockList table table-dark">
                     <thead>
-                    <tr>
-                        <th>Url</th>
-                        <th>Method</th>
-                        <th>Status code</th>
-                        <th>Content Type</th>
-                        <th>Body</th>
-                        <th>Actions</th>
+                    <tr className="d-flex">
+                        <th className="col-3">Url</th>
+                        <th className="col-1">Method</th>
+                        <th className="col-1">Status code</th>
+                        <th className="col-3">Headers</th>
+                        <th className="col-2">Body</th>
+                        <th className="col-3">Actions</th>
                     </tr>
                     </thead>
                     <tbody>
-                        {listItems}
+                    {listItems}
                     </tbody>
                 </table>
-                <button onClick={this.add.bind(this)} type="button" className="btn btn-primary">Add</button>
+                <button onClick={this.add.bind(this)} type="button" className="btn btn-primary">+</button>
             </div>
         )
     }
