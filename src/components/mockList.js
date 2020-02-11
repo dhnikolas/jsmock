@@ -1,14 +1,20 @@
 import React from 'react';
 import MockItem from './mockItem.js'
 import 'styles/mockList.css'
+import {EventEmitter} from "../events";
 
 class MockList extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            mockList: []
+            mockList: [],
+            searchString: ''
         };
         this.getMockList()
+
+        EventEmitter.subscribe('search:input', function (data) {
+            this.setState({searchString: data})
+        }.bind(this))
     }
 
     async getMockList() {
@@ -24,18 +30,18 @@ class MockList extends React.Component {
             method: 'POST',
             status: '200',
             contentType: '',
-            headers: [{"name":"Content-Type", "value": "application/xml"}],
+            headers: [{"name": "Content-Type", "value": "application/xml"}],
             body: '',
             isNew: true
         };
         this.setState({mockList: this.state.mockList.concat(emptyItem)})
     }
 
-    deleteById(id){
+    deleteById(id) {
         let m = [];
         m = this.state.mockList;
         m.forEach(function (v, i) {
-            if(v.id === id){
+            if (v.id === id) {
                 delete m[i]
             }
         });
@@ -43,13 +49,24 @@ class MockList extends React.Component {
         this.setState({mockList: m})
     }
 
-    search () {
-        
+    getActiveMocks(){
+        let m = this.state.mockList;
+        if (this.state.searchString.length > 0) {
+            m = m.filter(function (v) {
+                return v.mainUrl.search(this.state.searchString) !== -1
+            }.bind(this));
+        }
+        return m
     }
 
     render() {
-        const listItems = this.state.mockList.map((d, i) => <MockItem key={i} item={d}
+        let activeMocks = this.getActiveMocks();
+        const listItems = activeMocks.map((d, i) => <MockItem key={d.id} item={d}
                                                                       deleteById={this.deleteById.bind(this)}/>);
+
+       const buttonAdd = <button onClick={this.add.bind(this)} type="button" className="btn btn-primary">+</button>;
+
+        const showButton = this.state.searchString.length > 0 ? '' : buttonAdd;
         return (
             <div>
                 <table className="mockList table table-dark">
@@ -67,7 +84,7 @@ class MockList extends React.Component {
                     {listItems}
                     </tbody>
                 </table>
-                <button onClick={this.add.bind(this)} type="button" className="btn btn-primary">+</button>
+                {showButton}
             </div>
         )
     }

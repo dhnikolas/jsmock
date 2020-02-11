@@ -5,6 +5,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 import MockList from 'components/mockList.js'
 import Modal from 'components/modal.js'
+import Search from 'components/search.js'
 
 
 

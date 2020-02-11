@@ -1,4 +1,4 @@
 
-.updateButton{
-    background-color: green;
+.mockList .mockItem.isNew{
+    background-color: lightgrey;
 }

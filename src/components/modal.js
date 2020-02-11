@@ -29,7 +29,6 @@ class Modal extends React.Component{
     }
 
     saveModal(){
-        console.log(this.state.initiatorId)
         EventEmitter.trigger('saveModal' + this.state.initiatorId, {body: this.state.data.body, title: this.state.data.title});
         this.setState({data:{title: '', body: ''}, isOpen: false})
     }

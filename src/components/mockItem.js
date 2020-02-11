@@ -118,7 +118,6 @@ class MockItem extends React.Component {
         const event = 'openModal';
         data.initiatorId = name + this.state.item.id;
         data.type = type;
-        console.log(data)
         EventEmitter.trigger(event, data)
     }
 
@@ -165,7 +164,7 @@ class MockItem extends React.Component {
     render() {
         let actionsS;
         switch (true) {
-            case this.state.canUpdate && this.state.item.isNew:
+            case this.state.canUpdate:
                 actionsS = 'add';
                 break;
             case !this.state.canUpdate:
@@ -175,7 +174,7 @@ class MockItem extends React.Component {
         }
 
         return (
-            <tr className="mockItem d-flex">
+            <tr className={"mockItem d-flex" + (this.state.item.isNew ? " isNew" : "")}>
                 <th className="col-3">
                     <input className="form-control" type="text" name="mainUrl" value={this.state.item.mainUrl}
                            onChange={this.handleChanges.bind(this)}/>
