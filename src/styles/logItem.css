@@ -1,0 +1,18 @@
+.log-item {
+    text-align: left;
+    margin-bottom: 15px;
+    background-color: white;
+    border: none;
+    padding: 16px 32px;
+    font-size: 16px;
+    transition: 0.3s;
+}
+
+
+.log-item:hover {
+    background-color: #e2eaf1;
+}
+
+.log-current-time {
+    font-size: 14px;
+}

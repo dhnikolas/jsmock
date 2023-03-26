@@ -1,9 +1,9 @@
 import React from "react";
 import MockActions from "./mockActions.js"
+import LogList from "./logList.js"
 import {EventEmitter} from '../events.js'
 
-import 'styles/mockItem.css'
-
+import '../styles/mockItem.css'
 
 class MockItem extends React.Component {
     constructor(props) {
@@ -138,6 +138,12 @@ class MockItem extends React.Component {
         this.makeChanges('headers', this.formatHeadersObject(data.body))
     }
 
+    async getLogRequests() {
+        let mockId = this.state.item.id
+        let result = <LogList mockId={mockId} />
+        this.execModal('logs', {title: 'Log requests', body: result}, 'info')
+    }
+
     formatHeadersString(headers) {
         let headersString = '';
         headers.forEach(function (h, i) {
@@ -175,6 +181,11 @@ class MockItem extends React.Component {
 
         return (
             <tr className={"mockItem d-flex" + (this.state.item.isNew ? " isNew" : "")}>
+                <th className="col-1">
+                    <div style={{cursor: 'pointer', display: (this.state.item.isNew ? "none" : "block")}}
+                         onClick={this.getLogRequests.bind(this)}> ...
+                    </div>
+                </th>
                 <th className="col-3">
                     <input className="form-control" type="text" name="mainUrl" value={this.state.item.mainUrl}
                            onChange={this.handleChanges.bind(this)}/>
@@ -195,16 +206,16 @@ class MockItem extends React.Component {
                     <input className="form-control" type="number" name="status" value={this.state.item.status}
                            onChange={this.handleChanges.bind(this)}/>
                 </th>
-                <th className="col-3">
+                <th className="col-1">
                     <button className="btn btn-light" onClick={this.openHeaders.bind(this)}> ...</button>
 
                 </th>
-                <th className="col-2">
+                <th className="col-1">
                     <div style={{cursor: 'pointer'}}
                          onClick={this.openBody.bind(this)}> {this.state.item.body.substring(0, 10)} ...
                     </div>
                 </th>
-                <th className="col-3">
+                <th className="col-4">
                     <MockActions
                         actionsState={actionsS}
                         ref={this.mockActions}

@@ -1,6 +1,6 @@
 import React from 'react';
 import MockItem from './mockItem.js'
-import 'styles/mockList.css'
+import '../styles/mockList.css'
 import {EventEmitter} from "../events";
 
 class MockList extends React.Component {
@@ -72,12 +72,13 @@ class MockList extends React.Component {
                 <table className="mockList table table-dark">
                     <thead>
                     <tr className="d-flex">
+                        <th className="col-1"></th>
                         <th className="col-3">Url</th>
                         <th className="col-1">Method</th>
                         <th className="col-1">Status code</th>
-                        <th className="col-3">Headers</th>
-                        <th className="col-2">Body</th>
-                        <th className="col-3">Actions</th>
+                        <th className="col-1">Headers</th>
+                        <th className="col-1">Body</th>
+                        <th className="col-4">Actions</th>
                     </tr>
                     </thead>
                     <tbody>

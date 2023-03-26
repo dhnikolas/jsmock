@@ -46,8 +46,6 @@ class Modal extends React.Component{
         this.setState({data: currentData})
     }
 
-
-
     render() {
         const actionClose = <button type="button" key={"close"} onClick={this.closeModal.bind(this)} className="btn btn-secondary" data-dismiss="modal">Close</button>;
         const actionSave = <button type="button" key={"save"} onClick={this.saveModal.bind(this)} className="btn btn-primary">Save changes</button>;

@@ -1,5 +1,5 @@
 import React from "react";
-import 'styles/mockItem.css'
+import '../styles/mockItem.css'
 
 
 class MockActions extends React.Component {
